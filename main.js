@@ -9,7 +9,7 @@ import {
 } from "./distance-field.js";
 import { getGeometryData } from "./surface-nets.js";
 
-const distanceField = new DistanceField(64);
+const distanceField = new DistanceField(16);
 
 distanceField.drawDistanceFunction(
   translate(
@@ -17,7 +17,7 @@ distanceField.drawDistanceFunction(
     distanceField.height / 2,
     distanceField.depth / 2,
     merge(
-      torus(distanceField.width / 4, distanceField.width / 16),
+      // torus(distanceField.width / 4, distanceField.width / 16),
       sphere(distanceField.width / 4)
     )
   )
@@ -32,6 +32,8 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 camera.position.z = distanceField.depth;
+
+const group = new THREE.Group();
 
 const { positions, normals, indices } = getGeometryData(distanceField);
 
@@ -53,12 +55,18 @@ geometry.translate(
 //   roughness: 0.2,
 // });
 
-const material = new THREE.MeshNormalMaterial({
-  flatShading: true,
-});
+const material = new THREE.MeshNormalMaterial();
 
 const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+group.add(mesh);
+
+const wireframe = new THREE.WireframeGeometry(geometry);
+const line = new THREE.LineSegments(wireframe);
+line.material.opacity = 0.5;
+line.material.transparent = true;
+group.add(line);
+
+scene.add(group);
 
 {
   const light = new THREE.PointLight(0xffffff, 1, 0, 2);
