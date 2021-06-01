@@ -1,3 +1,5 @@
+import { length } from "./vector.js";
+
 export class DistanceField {
   constructor(width, height, depth) {
     this.width = width;
@@ -46,8 +48,4 @@ export function torus(rr, r) {
     const q = [length([x, z]) - rr, y];
     return length(q) - r;
   };
-}
-
-function length(v) {
-  return Math.sqrt(v.reduce((prev, curr) => prev + curr * curr, 0));
 }

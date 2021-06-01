@@ -9,7 +9,7 @@ import {
 } from "./distance-field.js";
 import { getGeometryData } from "./surface-nets.js";
 
-const distanceField = new DistanceField(16);
+const distanceField = new DistanceField(8);
 
 distanceField.drawDistanceFunction(
   translate(

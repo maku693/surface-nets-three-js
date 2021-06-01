@@ -1,3 +1,5 @@
+import { distance, length } from "./vector.js";
+
 const cubeEdgeCornerIndices = [
   [0, 1],
   [0, 2],
@@ -144,9 +146,7 @@ export function getGeometryData(distanceField) {
     ];
 
     // normalize
-    const normalLength = Math.sqrt(
-      normal.reduce((prev, curr) => prev + curr * curr, 0)
-    );
+    const normalLength = length(normal);
     for (let i = 0; i < normal.length; i++) {
       normal[i] = normal[i] / normalLength;
     }
@@ -191,26 +191,38 @@ export function getGeometryData(distanceField) {
       ]);
     }
 
+    if (quads.length === 0) continue;
+
     // build index buffer
     for (let j = 0; j < quads.length; j++) {
+      const q = quads[j];
+      const k0 = q[0] * 3;
+      const k1 = q[1] * 3;
+      const k2 = q[2] * 3;
+      const k3 = q[3] * 3;
+      const shortestDiagonal =
+        distance(
+          [positions[k0], positions[k0 + 1], positions[k0 + 2]],
+          [positions[k3], positions[k3 + 1], positions[k3 + 2]]
+        ) <
+        distance(
+          [positions[k1], positions[k1 + 1], positions[k1 + 2]],
+          [positions[k2], positions[k2 + 1], positions[k2 + 2]]
+        )
+          ? 0
+          : 1;
       if (cornerMask & 1) {
-        indices.push(
-          quads[j][0],
-          quads[j][3],
-          quads[j][1],
-          quads[j][0],
-          quads[j][2],
-          quads[j][3]
-        );
+        if (shortestDiagonal === 0) {
+          indices.push(q[0], q[3], q[1], q[0], q[2], q[3]);
+        } else {
+          indices.push(q[0], q[2], q[1], q[1], q[2], q[3]);
+        }
       } else {
-        indices.push(
-          quads[j][0],
-          quads[j][1],
-          quads[j][3],
-          quads[j][0],
-          quads[j][3],
-          quads[j][2]
-        );
+        if (shortestDiagonal === 0) {
+          indices.push(q[0], q[1], q[3], q[0], q[3], q[2]);
+        } else {
+          indices.push(q[0], q[1], q[2], q[1], q[3], q[2]);
+        }
       }
     }
   }
