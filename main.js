@@ -9,7 +9,7 @@ import {
 } from "./distance-field.js";
 import { getGeometryData } from "./surface-nets.js";
 
-const distanceField = new DistanceField(64);
+const distanceField = new DistanceField(32);
 
 distanceField.drawDistanceFunction(
   translate(
@@ -17,7 +17,7 @@ distanceField.drawDistanceFunction(
     distanceField.height / 2,
     distanceField.depth / 2,
     merge(
-      torus(distanceField.width / 4, distanceField.width / 8),
+      // torus(distanceField.width / 4, distanceField.width / 16),
       sphere(distanceField.width / 4)
     )
   )
@@ -60,11 +60,11 @@ const material = new THREE.MeshNormalMaterial();
 const mesh = new THREE.Mesh(geometry, material);
 group.add(mesh);
 
-const wireframe = new THREE.WireframeGeometry(geometry);
-const line = new THREE.LineSegments(wireframe);
-line.material.opacity = 0.5;
-line.material.transparent = true;
-group.add(line);
+// const wireframe = new THREE.WireframeGeometry(geometry);
+// const line = new THREE.LineSegments(wireframe);
+// line.material.opacity = 0.5;
+// line.material.transparent = true;
+// group.add(line);
 
 scene.add(group);
 
@@ -83,7 +83,8 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-new OrbitControls(camera, renderer.domElement);
+const control = new OrbitControls(camera, renderer.domElement);
+control.enablePan = false;
 
 renderer.render(scene, camera);
 
