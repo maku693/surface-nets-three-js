@@ -50,12 +50,12 @@ geometry.translate(
   distanceField.depth * -0.5
 );
 
-// const material = new THREE.MeshStandardMaterial({
-//   color: 0x808080,
-//   roughness: 0.1,
-// });
+const material = new THREE.MeshStandardMaterial({
+  color: 0x808080,
+  roughness: 0.5,
+});
 
-const material = new THREE.MeshNormalMaterial();
+// const material = new THREE.MeshNormalMaterial();
 
 const mesh = new THREE.Mesh(geometry, material);
 group.add(mesh);
@@ -69,17 +69,19 @@ group.add(mesh);
 scene.add(group);
 
 {
-  const light = new THREE.PointLight(0xffffff, 1, 0, 2);
+  const light = new THREE.PointLight(0xffffff, 10000, 0, 2);
   light.position.set(64, 64, 64);
   scene.add(light);
 }
 {
-  const light = new THREE.PointLight(0xffffff, 1, 0, 2);
+  const light = new THREE.PointLight(0xffffff, 10000, 0, 2);
   light.position.set(-64, -64, -64);
   scene.add(light);
 }
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.physicallyCorrectLights = true;
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
