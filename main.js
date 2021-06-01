@@ -9,7 +9,7 @@ import {
 } from "./distance-field.js";
 import { getGeometryData } from "./surface-nets.js";
 
-const distanceField = new DistanceField(8);
+const distanceField = new DistanceField(64);
 
 distanceField.drawDistanceFunction(
   translate(
@@ -17,7 +17,7 @@ distanceField.drawDistanceFunction(
     distanceField.height / 2,
     distanceField.depth / 2,
     merge(
-      // torus(distanceField.width / 4, distanceField.width / 16),
+      torus(distanceField.width / 4, distanceField.width / 8),
       sphere(distanceField.width / 4)
     )
   )
@@ -52,7 +52,7 @@ geometry.translate(
 
 // const material = new THREE.MeshStandardMaterial({
 //   color: 0x808080,
-//   roughness: 0.2,
+//   roughness: 0.1,
 // });
 
 const material = new THREE.MeshNormalMaterial();
