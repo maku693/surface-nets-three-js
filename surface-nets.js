@@ -193,7 +193,7 @@ export function getGeometryData(distanceField) {
           quadCount++;
         }
 
-        if (quads.length === 0) continue;
+        if (quadCount === 0) continue;
 
         // build index buffer
         for (let j = 0; j < quadCount; j++) {
