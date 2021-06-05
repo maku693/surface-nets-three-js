@@ -14,7 +14,7 @@ var stats = new Stats();
 stats.showPanel(1);
 document.body.appendChild(stats.dom);
 
-const distanceField = new DistanceField(32);
+const distanceField = new DistanceField(64);
 
 // distanceField.drawDistanceFunction(
 //   translate(
@@ -113,9 +113,9 @@ setInterval(() => {
   stats.begin();
   distanceField.drawDistanceFunction(
     translate(
-      random(distanceField.width / 4, (distanceField.width / 4) * 3),
-      random(distanceField.height / 4, (distanceField.height / 4) * 3),
-      random(distanceField.depth / 4, (distanceField.depth / 4) * 3),
+      random((distanceField.width / 4) * 1, (distanceField.width / 4) * 3),
+      random((distanceField.height / 4) * 1, (distanceField.height / 4) * 3),
+      random((distanceField.depth / 4) * 1, (distanceField.depth / 4) * 3),
       sphere(distanceField.width / 16)
     )
   );
