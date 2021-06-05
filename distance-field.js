@@ -11,16 +11,19 @@ export class DistanceField {
   }
 
   drawDistanceFunction(f) {
-    const { width, height, data } = this;
-    for (let i = 0; i < data.length; i++) {
-      const x = i % width;
-      const y = ((i / width) | 0) % height;
-      const z = (i / width / height) | 0;
-      data[i] = Math.min(
-        data[i],
-        // Shift the sampling point to center of the voxel
-        f(x + 0.5, y + 0.5, z + 0.5)
-      );
+    const { width, height, depth, data } = this;
+    let i = 0;
+    for (let z = 0; z < depth; z++) {
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          data[i] = Math.min(
+            data[i],
+            // Shift the sampling point to center of the voxel
+            f(x + 0.5, y + 0.5, z + 0.5)
+          );
+          i++;
+        }
+      }
     }
   }
 }
