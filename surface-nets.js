@@ -113,9 +113,8 @@ export function getGeometryData(distanceField) {
         }
 
         if (edgeCount === 0) continue;
-        const vi = verticesCount * 3;
 
-        gridIndices[i] = verticesCount;
+        gridIndices[i] = verticesCount / 3;
 
         dx /= edgeCount;
         dy /= edgeCount;
@@ -125,9 +124,9 @@ export function getGeometryData(distanceField) {
         const vx = x + 0.5 + dx;
         const vy = y + 0.5 + dy;
         const vz = z + 0.5 + dz;
-        positions[vi] = vx;
-        positions[vi + 1] = vy;
-        positions[vi + 2] = vz;
+        positions[verticesCount] = vx;
+        positions[verticesCount + 1] = vy;
+        positions[verticesCount + 2] = vz;
 
         // x, y, z
         const j = x + y * fieldWidth + z * fieldWidth * fieldHeight;
@@ -139,21 +138,22 @@ export function getGeometryData(distanceField) {
         const d5 = data[j + 1 + fieldWidth * fieldHeight];
         const d6 = data[j + fieldWidth + fieldWidth * fieldHeight];
         const d7 = data[j + 1 + fieldWidth + fieldWidth * fieldHeight];
-        normals[vi] = d1 - d0 + d3 - d2 + d5 - d4 + d7 - d6;
-        normals[vi + 1] = d2 - d0 + d3 - d1 + d6 - d4 + d7 - d5;
-        normals[vi + 2] = d4 - d0 + d5 - d1 + d6 - d2 + d7 - d3;
+        normals[verticesCount] = d1 - d0 + d3 - d2 + d5 - d4 + d7 - d6;
+        normals[verticesCount + 1] = d2 - d0 + d3 - d1 + d6 - d4 + d7 - d5;
+        normals[verticesCount + 2] = d4 - d0 + d5 - d1 + d6 - d2 + d7 - d3;
 
         // normalize
         const normalLength = length([
-          normals[vi],
-          normals[vi + 1],
-          normals[vi + 2],
+          normals[verticesCount],
+          normals[verticesCount + 1],
+          normals[verticesCount + 2],
         ]);
         for (let j = 0; j < 3; j++) {
-          normals[vi + j] = normals[vi + j] / normalLength;
+          normals[verticesCount + j] =
+            normals[verticesCount + j] / normalLength;
         }
 
-        verticesCount++;
+        verticesCount += 3;
 
         const quads = [];
         if (edges & 0b000000000001) {
@@ -195,8 +195,6 @@ export function getGeometryData(distanceField) {
 
         if (quads.length === 0) continue;
 
-        const ii = indicesCount * 6;
-
         // build index buffer
         for (let j = 0; j < quads.length; j++) {
           const q = quads[j];
@@ -217,47 +215,47 @@ export function getGeometryData(distanceField) {
               : 1;
           if (cornerMask & 1) {
             if (shortestDiagonal === 0) {
-              indices[ii + 0] = q[0];
-              indices[ii + 1] = q[3];
-              indices[ii + 2] = q[1];
-              indices[ii + 3] = q[0];
-              indices[ii + 4] = q[2];
-              indices[ii + 5] = q[3];
+              indices[indicesCount + 0] = q[0];
+              indices[indicesCount + 1] = q[3];
+              indices[indicesCount + 2] = q[1];
+              indices[indicesCount + 3] = q[0];
+              indices[indicesCount + 4] = q[2];
+              indices[indicesCount + 5] = q[3];
             } else {
-              indices[ii + 0] = q[0];
-              indices[ii + 1] = q[2];
-              indices[ii + 2] = q[1];
-              indices[ii + 3] = q[1];
-              indices[ii + 4] = q[2];
-              indices[ii + 5] = q[3];
+              indices[indicesCount + 0] = q[0];
+              indices[indicesCount + 1] = q[2];
+              indices[indicesCount + 2] = q[1];
+              indices[indicesCount + 3] = q[1];
+              indices[indicesCount + 4] = q[2];
+              indices[indicesCount + 5] = q[3];
             }
           } else {
             if (shortestDiagonal === 0) {
-              indices[ii + 0] = q[0];
-              indices[ii + 1] = q[1];
-              indices[ii + 2] = q[3];
-              indices[ii + 3] = q[0];
-              indices[ii + 4] = q[3];
-              indices[ii + 5] = q[2];
+              indices[indicesCount + 0] = q[0];
+              indices[indicesCount + 1] = q[1];
+              indices[indicesCount + 2] = q[3];
+              indices[indicesCount + 3] = q[0];
+              indices[indicesCount + 4] = q[3];
+              indices[indicesCount + 5] = q[2];
             } else {
-              indices[ii + 0] = q[0];
-              indices[ii + 1] = q[1];
-              indices[ii + 2] = q[2];
-              indices[ii + 3] = q[1];
-              indices[ii + 4] = q[3];
-              indices[ii + 5] = q[2];
+              indices[indicesCount + 0] = q[0];
+              indices[indicesCount + 1] = q[1];
+              indices[indicesCount + 2] = q[2];
+              indices[indicesCount + 3] = q[1];
+              indices[indicesCount + 4] = q[3];
+              indices[indicesCount + 5] = q[2];
             }
           }
 
-          indicesCount++;
+          indicesCount += 6;
         }
       }
     }
   }
 
   return {
-    positions: positions.slice(0, verticesCount * 3),
-    normals: normals.slice(0, verticesCount * 3),
-    indices: indices.slice(0, indicesCount * 6),
+    positions: positions.slice(0, verticesCount),
+    normals: normals.slice(0, verticesCount),
+    indices: indices.slice(0, indicesCount),
   };
 }
