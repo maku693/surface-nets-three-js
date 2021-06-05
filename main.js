@@ -1,3 +1,4 @@
+import Stats from "https://cdn.skypack.dev/stats.js";
 import * as THREE from "https://cdn.skypack.dev/three";
 import { OrbitControls } from "https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js";
 import {
@@ -8,6 +9,10 @@ import {
   translate,
 } from "./distance-field.js";
 import { getGeometryData } from "./surface-nets.js";
+
+var stats = new Stats();
+stats.showPanel(1);
+document.body.appendChild(stats.dom);
 
 const distanceField = new DistanceField(32);
 
@@ -50,12 +55,12 @@ geometry.translate(
   distanceField.depth * -0.5
 );
 
-// const material = new THREE.MeshStandardMaterial({
-//   color: 0x808080,
-//   roughness: 0.5,
-// });
+const material = new THREE.MeshStandardMaterial({
+  color: 0x808080,
+  roughness: 0.5,
+});
 
-const material = new THREE.MeshNormalMaterial();
+// const material = new THREE.MeshNormalMaterial();
 
 const mesh = new THREE.Mesh(geometry, material);
 group.add(mesh);
@@ -100,14 +105,12 @@ function onWindowResize() {
 }
 
 (function render() {
-  requestAnimationFrame(render);
-
   renderer.render(scene, camera);
+  requestAnimationFrame(render);
 })();
 
 setInterval(() => {
-  console.time("drawLoop");
-
+  stats.begin();
   distanceField.drawDistanceFunction(
     translate(
       random(distanceField.width / 4, (distanceField.width / 4) * 3),
@@ -130,8 +133,7 @@ setInterval(() => {
     distanceField.depth * -0.5
   );
   geometry.setIndex(indices);
-
-  console.timeEnd("drawLoop");
+  stats.end();
 }, 16);
 
 function random(min, max) {
