@@ -51,10 +51,11 @@ export function getGeometryData(distanceField) {
   const gridHeight = fieldHeight - 1;
   const gridDepth = fieldDepth - 1;
 
+  let i = -1;
   for (let z = 0; z < gridDepth; z++) {
     for (let y = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth; x++) {
-        const i = x + y * gridWidth + z * gridWidth * gridHeight;
+        i++;
         let cornerMask = 0;
         let quadCount = 0;
 
@@ -78,7 +79,7 @@ export function getGeometryData(distanceField) {
         let dx = 0;
         let dy = 0;
         let dz = 0;
-        for (let j = 0; j < cubeEdgeCornerIndices.length; j++) {
+        for (let j = 0; j < 12; j++) {
           if (!(edges & (1 << j))) continue;
           edgeCount++;
 
