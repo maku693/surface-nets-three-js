@@ -11,17 +11,17 @@ import { getGeometryData } from "./surface-nets.js";
 
 const distanceField = new DistanceField(32);
 
-distanceField.drawDistanceFunction(
-  translate(
-    distanceField.width / 2,
-    distanceField.height / 2,
-    distanceField.depth / 2,
-    merge(
-      // torus(distanceField.width / 4, distanceField.width / 16),
-      sphere(distanceField.width / 4)
-    )
-  )
-);
+// distanceField.drawDistanceFunction(
+//   translate(
+//     distanceField.width / 2,
+//     distanceField.height / 2,
+//     distanceField.depth / 2,
+//     merge(
+//       torus(distanceField.width / 4, distanceField.width / 16),
+//       sphere(distanceField.width / 4)
+//     )
+//   )
+// );
 
 const scene = new THREE.Scene();
 
@@ -50,12 +50,12 @@ geometry.translate(
   distanceField.depth * -0.5
 );
 
-const material = new THREE.MeshStandardMaterial({
-  color: 0x808080,
-  roughness: 0.5,
-});
+// const material = new THREE.MeshStandardMaterial({
+//   color: 0x808080,
+//   roughness: 0.5,
+// });
 
-// const material = new THREE.MeshNormalMaterial();
+const material = new THREE.MeshNormalMaterial();
 
 const mesh = new THREE.Mesh(geometry, material);
 group.add(mesh);
@@ -104,3 +104,36 @@ function onWindowResize() {
 
   renderer.render(scene, camera);
 })();
+
+setInterval(() => {
+  console.time("drawLoop");
+
+  distanceField.drawDistanceFunction(
+    translate(
+      random(distanceField.width / 4, (distanceField.width / 4) * 3),
+      random(distanceField.height / 4, (distanceField.height / 4) * 3),
+      random(distanceField.depth / 4, (distanceField.depth / 4) * 3),
+      sphere(distanceField.width / 16)
+    )
+  );
+
+  const { positions, normals, indices } = getGeometryData(distanceField);
+
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3)
+  );
+  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.translate(
+    distanceField.width * -0.5,
+    distanceField.height * -0.5,
+    distanceField.depth * -0.5
+  );
+  geometry.setIndex(indices);
+
+  console.timeEnd("drawLoop");
+}, 16);
+
+function random(min, max) {
+  return min + Math.random() * (max - min);
+}
