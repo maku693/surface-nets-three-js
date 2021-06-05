@@ -197,11 +197,11 @@ export function getGeometryData(distanceField) {
 
         // build index buffer
         for (let j = 0; j < quadCount; j++) {
-          const q = quads[j];
-          const k0 = q[0] * 3;
-          const k1 = q[1] * 3;
-          const k2 = q[2] * 3;
-          const k3 = q[3] * 3;
+          const [q0, q1, q2, q3] = quads[j];
+          const k0 = q0 * 3;
+          const k1 = q1 * 3;
+          const k2 = q2 * 3;
+          const k3 = q3 * 3;
           const shortestDiagonal =
             distance(
               [positions[k0], positions[k0 + 1], positions[k0 + 2]],
@@ -215,35 +215,35 @@ export function getGeometryData(distanceField) {
               : 1;
           if (cornerMask & 1) {
             if (shortestDiagonal === 0) {
-              indices[indicesCount + 0] = q[0];
-              indices[indicesCount + 1] = q[3];
-              indices[indicesCount + 2] = q[1];
-              indices[indicesCount + 3] = q[0];
-              indices[indicesCount + 4] = q[2];
-              indices[indicesCount + 5] = q[3];
+              indices[indicesCount + 0] = q0;
+              indices[indicesCount + 1] = q3;
+              indices[indicesCount + 2] = q1;
+              indices[indicesCount + 3] = q0;
+              indices[indicesCount + 4] = q2;
+              indices[indicesCount + 5] = q3;
             } else {
-              indices[indicesCount + 0] = q[0];
-              indices[indicesCount + 1] = q[2];
-              indices[indicesCount + 2] = q[1];
-              indices[indicesCount + 3] = q[1];
-              indices[indicesCount + 4] = q[2];
-              indices[indicesCount + 5] = q[3];
+              indices[indicesCount + 0] = q0;
+              indices[indicesCount + 1] = q2;
+              indices[indicesCount + 2] = q1;
+              indices[indicesCount + 3] = q1;
+              indices[indicesCount + 4] = q2;
+              indices[indicesCount + 5] = q3;
             }
           } else {
             if (shortestDiagonal === 0) {
-              indices[indicesCount + 0] = q[0];
-              indices[indicesCount + 1] = q[1];
-              indices[indicesCount + 2] = q[3];
-              indices[indicesCount + 3] = q[0];
-              indices[indicesCount + 4] = q[3];
-              indices[indicesCount + 5] = q[2];
+              indices[indicesCount + 0] = q0;
+              indices[indicesCount + 1] = q1;
+              indices[indicesCount + 2] = q3;
+              indices[indicesCount + 3] = q0;
+              indices[indicesCount + 4] = q3;
+              indices[indicesCount + 5] = q2;
             } else {
-              indices[indicesCount + 0] = q[0];
-              indices[indicesCount + 1] = q[1];
-              indices[indicesCount + 2] = q[2];
-              indices[indicesCount + 3] = q[1];
-              indices[indicesCount + 4] = q[3];
-              indices[indicesCount + 5] = q[2];
+              indices[indicesCount + 0] = q0;
+              indices[indicesCount + 1] = q1;
+              indices[indicesCount + 2] = q2;
+              indices[indicesCount + 3] = q1;
+              indices[indicesCount + 4] = q3;
+              indices[indicesCount + 5] = q2;
             }
           }
 
