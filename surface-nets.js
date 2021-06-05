@@ -31,11 +31,14 @@ const edgeBitFields = new Array(256);
   }
 }
 
+const positions = new Array(2048);
+const normals = new Array(2048);
+const indices = new Array(16384);
+const gridIndices = {};
+
 export function getGeometryData(distanceField) {
-  const positions = [];
-  const normals = [];
-  const gridIndices = {};
-  const indices = [];
+  let verticesCount = 0;
+  let indicesCount = 0;
 
   const fieldWidth = distanceField.width;
   const fieldHeight = distanceField.height;
@@ -110,8 +113,9 @@ export function getGeometryData(distanceField) {
         }
 
         if (edgeCount === 0) continue;
+        const vi = verticesCount * 3;
 
-        gridIndices[i] = positions.length / 3;
+        gridIndices[i] = verticesCount;
 
         dx /= edgeCount;
         dy /= edgeCount;
@@ -121,8 +125,9 @@ export function getGeometryData(distanceField) {
         const vx = x + 0.5 + dx;
         const vy = y + 0.5 + dy;
         const vz = z + 0.5 + dz;
-
-        positions.push(vx, vy, vz);
+        positions[vi] = vx;
+        positions[vi + 1] = vy;
+        positions[vi + 2] = vz;
 
         // x, y, z
         const j = x + y * fieldWidth + z * fieldWidth * fieldHeight;
@@ -134,18 +139,21 @@ export function getGeometryData(distanceField) {
         const d5 = data[j + 1 + fieldWidth * fieldHeight];
         const d6 = data[j + fieldWidth + fieldWidth * fieldHeight];
         const d7 = data[j + 1 + fieldWidth + fieldWidth * fieldHeight];
-        const normal = [
-          d1 - d0 + d3 - d2 + d5 - d4 + d7 - d6,
-          d2 - d0 + d3 - d1 + d6 - d4 + d7 - d5,
-          d4 - d0 + d5 - d1 + d6 - d2 + d7 - d3,
-        ];
+        normals[vi] = d1 - d0 + d3 - d2 + d5 - d4 + d7 - d6;
+        normals[vi + 1] = d2 - d0 + d3 - d1 + d6 - d4 + d7 - d5;
+        normals[vi + 2] = d4 - d0 + d5 - d1 + d6 - d2 + d7 - d3;
 
         // normalize
-        const normalLength = length(normal);
+        const normalLength = length([
+          normals[vi],
+          normals[vi + 1],
+          normals[vi + 2],
+        ]);
         for (let j = 0; j < 3; j++) {
-          normal[j] = normal[j] / normalLength;
+          normals[vi + j] = normals[vi + j] / normalLength;
         }
-        normals.push(...normal);
+
+        verticesCount++;
 
         const quads = [];
         if (edges & 0b000000000001) {
@@ -187,6 +195,8 @@ export function getGeometryData(distanceField) {
 
         if (quads.length === 0) continue;
 
+        const ii = indicesCount * 6;
+
         // build index buffer
         for (let j = 0; j < quads.length; j++) {
           const q = quads[j];
@@ -207,21 +217,47 @@ export function getGeometryData(distanceField) {
               : 1;
           if (cornerMask & 1) {
             if (shortestDiagonal === 0) {
-              indices.push(q[0], q[3], q[1], q[0], q[2], q[3]);
+              indices[ii + 0] = q[0];
+              indices[ii + 1] = q[3];
+              indices[ii + 2] = q[1];
+              indices[ii + 3] = q[0];
+              indices[ii + 4] = q[2];
+              indices[ii + 5] = q[3];
             } else {
-              indices.push(q[0], q[2], q[1], q[1], q[2], q[3]);
+              indices[ii + 0] = q[0];
+              indices[ii + 1] = q[2];
+              indices[ii + 2] = q[1];
+              indices[ii + 3] = q[1];
+              indices[ii + 4] = q[2];
+              indices[ii + 5] = q[3];
             }
           } else {
             if (shortestDiagonal === 0) {
-              indices.push(q[0], q[1], q[3], q[0], q[3], q[2]);
+              indices[ii + 0] = q[0];
+              indices[ii + 1] = q[1];
+              indices[ii + 2] = q[3];
+              indices[ii + 3] = q[0];
+              indices[ii + 4] = q[3];
+              indices[ii + 5] = q[2];
             } else {
-              indices.push(q[0], q[1], q[2], q[1], q[3], q[2]);
+              indices[ii + 0] = q[0];
+              indices[ii + 1] = q[1];
+              indices[ii + 2] = q[2];
+              indices[ii + 3] = q[1];
+              indices[ii + 4] = q[3];
+              indices[ii + 5] = q[2];
             }
           }
+
+          indicesCount++;
         }
       }
     }
   }
 
-  return { positions, normals, indices };
+  return {
+    positions: positions.slice(0, verticesCount * 3),
+    normals: normals.slice(0, verticesCount * 3),
+    indices: indices.slice(0, indicesCount * 6),
+  };
 }
