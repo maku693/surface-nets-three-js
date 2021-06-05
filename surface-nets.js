@@ -35,6 +35,7 @@ const positions = new Array(2048);
 const normals = new Array(2048);
 const indices = new Array(16384);
 const gridIndices = {};
+const quads = new Array(3);
 
 export function getGeometryData(distanceField) {
   let verticesCount = 0;
@@ -55,20 +56,16 @@ export function getGeometryData(distanceField) {
       for (let x = 0; x < gridWidth; x++) {
         const i = x + y * gridWidth + z * gridWidth * gridHeight;
         let cornerMask = 0;
+        let quadCount = 0;
 
-        for (let w = 0; w < 2; w++) {
-          for (let v = 0; v < 2; v++) {
-            for (let u = 0; u < 2; u++) {
-              const j = u + v * 2 + w * 4;
-              const k =
-                x +
-                u +
-                (y + v) * fieldWidth +
-                (z + w) * fieldWidth * fieldHeight;
-              if (data[k] > 0) {
-                cornerMask |= 1 << j;
-              }
-            }
+        for (let j = 0; j < 8; j++) {
+          const u = j & 1;
+          const v = (j >> 1) & 1;
+          const w = (j >> 2) & 1;
+          const k =
+            x + u + (y + v) * fieldWidth + (z + w) * fieldWidth * fieldHeight;
+          if (data[k] > 0) {
+            cornerMask |= 1 << j;
           }
         }
 
@@ -86,9 +83,9 @@ export function getGeometryData(distanceField) {
           edgeCount++;
 
           const c0 = cubeEdgeCornerIndices[j][0];
-          const c0x = c0 % 2;
-          const c0y = ((c0 / 2) | 0) % 2;
-          const c0z = (c0 / 2 / 2) | 0;
+          const c0x = c0 & 1;
+          const c0y = (c0 >> 1) & 1;
+          const c0z = (c0 >> 2) & 1;
           const k0 =
             x +
             c0x +
@@ -97,9 +94,9 @@ export function getGeometryData(distanceField) {
           const d0 = data[k0];
 
           const c1 = cubeEdgeCornerIndices[j][1];
-          const c1x = c1 % 2;
-          const c1y = ((c1 / 2) | 0) % 2;
-          const c1z = (c1 / 2 / 2) | 0;
+          const c1x = c1 & 1;
+          const c1y = (c1 >> 1) & 1;
+          const c1z = (c1 >> 2) & 1;
           const k1 =
             x +
             c1x +
@@ -143,7 +140,7 @@ export function getGeometryData(distanceField) {
         normals[verticesCount + 2] = d4 - d0 + d5 - d1 + d6 - d2 + d7 - d3;
 
         // normalize
-        const normalLength = length([
+        let normalLength = length([
           normals[verticesCount],
           normals[verticesCount + 1],
           normals[verticesCount + 2],
@@ -155,48 +152,50 @@ export function getGeometryData(distanceField) {
 
         verticesCount += 3;
 
-        const quads = [];
         if (edges & 0b000000000001) {
           // x, y - 1, z,
           // x, y - 1, z - 1
           // x, y, z
           // x, y, z - 1
-          quads.push([
+          quads[quadCount] = [
             gridIndices[i - gridWidth],
             gridIndices[i - gridWidth - gridWidth * gridHeight],
             gridIndices[i],
             gridIndices[i - gridWidth * gridHeight],
-          ]);
+          ];
+          quadCount++;
         }
         if (edges & 0b000000000010) {
           // x, y, z
           // x, y, z - 1
           // x - 1, y, z
           // x - 1, y, z - 1
-          quads.push([
+          quads[quadCount] = [
             gridIndices[i],
             gridIndices[i - gridWidth * gridHeight],
             gridIndices[i - 1],
             gridIndices[i - 1 - gridWidth * gridHeight],
-          ]);
+          ];
+          quadCount++;
         }
         if (edges & 0b000000010000) {
           // x - 1, y - 1, z
           // x, y - 1, z
           // x - 1, y, z
           // x, y, z
-          quads.push([
+          quads[quadCount] = [
             gridIndices[i - 1 - gridWidth],
             gridIndices[i - gridWidth],
             gridIndices[i - 1],
             gridIndices[i],
-          ]);
+          ];
+          quadCount++;
         }
 
         if (quads.length === 0) continue;
 
         // build index buffer
-        for (let j = 0; j < quads.length; j++) {
+        for (let j = 0; j < quadCount; j++) {
           const q = quads[j];
           const k0 = q[0] * 3;
           const k1 = q[1] * 3;
