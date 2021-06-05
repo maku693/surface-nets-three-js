@@ -55,12 +55,12 @@ geometry.translate(
   distanceField.depth * -0.5
 );
 
-const material = new THREE.MeshStandardMaterial({
-  color: 0x808080,
-  roughness: 0.5,
-});
+// const material = new THREE.MeshStandardMaterial({
+//   color: 0x808080,
+//   roughness: 0.5,
+// });
 
-// const material = new THREE.MeshNormalMaterial();
+const material = new THREE.MeshNormalMaterial();
 
 const mesh = new THREE.Mesh(geometry, material);
 group.add(mesh);
