@@ -1,5 +1,3 @@
-import { distance, length } from "./vector.js";
-
 const cubeEdgeCornerIndices = [
   [0, 1],
   [0, 2],
@@ -152,11 +150,13 @@ export function getGeometryData(distanceField) {
         normals[verticesCount + 2] = d4 - d0 + d5 - d1 + d6 - d2 + d7 - d3;
 
         // normalize
-        let normalLength = length([
-          normals[verticesCount],
-          normals[verticesCount + 1],
-          normals[verticesCount + 2],
-        ]);
+        let normalLength = 0;
+        for (let j = 0; j < 3; j++) {
+          const p = normals[verticesCount + j];
+          normalLength += p * p;
+        }
+        normalLength = Math.sqrt(normalLength);
+
         for (let j = 0; j < 3; j++) {
           normals[verticesCount + j] =
             normals[verticesCount + j] / normalLength;
