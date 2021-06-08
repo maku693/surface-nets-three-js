@@ -31,6 +31,17 @@ const edgeBitFields = new Array(256);
   }
 }
 
+const quadIndices = [
+  [
+    [0, 1, 3, 0, 3, 2],
+    [0, 3, 1, 0, 2, 3],
+  ],
+  [
+    [0, 1, 2, 1, 3, 2],
+    [0, 2, 1, 1, 2, 3],
+  ],
+];
+
 const positions = new Array(2048);
 const normals = new Array(2048);
 const indices = new Array(16384);
@@ -197,52 +208,23 @@ export function getGeometryData(distanceField) {
 
         // build index buffer
         for (let j = 0; j < quadCount; j++) {
-          const [q0, q1, q2, q3] = quads[j];
-          let l0 = 0;
-          let l1 = 0;
+          const quad = quads[j];
+          const a = quad[0] * 3;
+          const b = quad[1] * 3;
+          const c = quad[2] * 3;
+          const d = quad[3] * 3;
+          let l = 0;
+          let m = 0;
           for (let k = 0; k < 3; k++) {
-            const p = positions[q0 + k] - positions[q3 + k];
-            const s = positions[q1 + k] - positions[q2 + k];
-            l0 += p * p;
-            l1 += s * s;
+            const p = positions[a + k] - positions[c + k];
+            const q = positions[b + k] - positions[d + k];
+            l += p * p;
+            m += q * q;
           }
-          const shortestDiagonal = (l0 > l1) | 0;
-          const isBackFace = cornerMask & 1;
-
-          if (shortestDiagonal === 0) {
-            if (isBackFace) {
-              indices[indicesCount + 0] = q0;
-              indices[indicesCount + 1] = q3;
-              indices[indicesCount + 2] = q1;
-              indices[indicesCount + 3] = q0;
-              indices[indicesCount + 4] = q2;
-              indices[indicesCount + 5] = q3;
-            } else {
-              indices[indicesCount + 0] = q0;
-              indices[indicesCount + 1] = q1;
-              indices[indicesCount + 2] = q3;
-              indices[indicesCount + 3] = q0;
-              indices[indicesCount + 4] = q3;
-              indices[indicesCount + 5] = q2;
-            }
-          } else {
-            if (isBackFace) {
-              indices[indicesCount + 0] = q0;
-              indices[indicesCount + 1] = q2;
-              indices[indicesCount + 2] = q1;
-              indices[indicesCount + 3] = q1;
-              indices[indicesCount + 4] = q2;
-              indices[indicesCount + 5] = q3;
-            } else {
-              indices[indicesCount + 0] = q0;
-              indices[indicesCount + 1] = q1;
-              indices[indicesCount + 2] = q2;
-              indices[indicesCount + 3] = q1;
-              indices[indicesCount + 4] = q3;
-              indices[indicesCount + 5] = q2;
-            }
+          const quadIndex = quadIndices[(l > m) | 0][(cornerMask & 1) | 0];
+          for (let k = 0; k < 6; k++) {
+            indices[indicesCount + k] = quad[quadIndex[k]];
           }
-
           indicesCount += 6;
         }
       }
