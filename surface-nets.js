@@ -198,23 +198,19 @@ export function getGeometryData(distanceField) {
         // build index buffer
         for (let j = 0; j < quadCount; j++) {
           const [q0, q1, q2, q3] = quads[j];
-          const k0 = q0 * 3;
-          const k1 = q1 * 3;
-          const k2 = q2 * 3;
-          const k3 = q3 * 3;
-          const shortestDiagonal =
-            distance(
-              [positions[k0], positions[k0 + 1], positions[k0 + 2]],
-              [positions[k3], positions[k3 + 1], positions[k3 + 2]]
-            ) <
-            distance(
-              [positions[k1], positions[k1 + 1], positions[k1 + 2]],
-              [positions[k2], positions[k2 + 1], positions[k2 + 2]]
-            )
-              ? 0
-              : 1;
-          if (cornerMask & 1) {
-            if (shortestDiagonal === 0) {
+          let l0 = 0;
+          let l1 = 0;
+          for (let k = 0; k < 3; k++) {
+            const p = positions[q0 + k] - positions[q3 + k];
+            const s = positions[q1 + k] - positions[q2 + k];
+            l0 += p * p;
+            l1 += s * s;
+          }
+          const shortestDiagonal = (l0 > l1) | 0;
+          const isBackFace = cornerMask & 1;
+
+          if (shortestDiagonal === 0) {
+            if (isBackFace) {
               indices[indicesCount + 0] = q0;
               indices[indicesCount + 1] = q3;
               indices[indicesCount + 2] = q1;
@@ -223,20 +219,20 @@ export function getGeometryData(distanceField) {
               indices[indicesCount + 5] = q3;
             } else {
               indices[indicesCount + 0] = q0;
-              indices[indicesCount + 1] = q2;
-              indices[indicesCount + 2] = q1;
-              indices[indicesCount + 3] = q1;
-              indices[indicesCount + 4] = q2;
-              indices[indicesCount + 5] = q3;
-            }
-          } else {
-            if (shortestDiagonal === 0) {
-              indices[indicesCount + 0] = q0;
               indices[indicesCount + 1] = q1;
               indices[indicesCount + 2] = q3;
               indices[indicesCount + 3] = q0;
               indices[indicesCount + 4] = q3;
               indices[indicesCount + 5] = q2;
+            }
+          } else {
+            if (isBackFace) {
+              indices[indicesCount + 0] = q0;
+              indices[indicesCount + 1] = q2;
+              indices[indicesCount + 2] = q1;
+              indices[indicesCount + 3] = q1;
+              indices[indicesCount + 4] = q2;
+              indices[indicesCount + 5] = q3;
             } else {
               indices[indicesCount + 0] = q0;
               indices[indicesCount + 1] = q1;
