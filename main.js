@@ -14,7 +14,7 @@ var stats = new Stats();
 stats.showPanel(1);
 document.body.appendChild(stats.dom);
 
-const distanceField = new DistanceField(32);
+const distanceField = new DistanceField(64);
 
 // distanceField.drawDistanceFunction(
 //   translate(
