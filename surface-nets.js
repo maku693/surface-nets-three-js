@@ -32,10 +32,10 @@ const edgeBitFields = new Array(256);
 const quadIndices = [
   [
     [0, 1, 3, 0, 3, 2],
-    [0, 3, 1, 0, 2, 3],
+    [0, 1, 2, 1, 3, 2],
   ],
   [
-    [0, 1, 2, 1, 3, 2],
+    [0, 3, 1, 0, 2, 3],
     [0, 2, 1, 1, 2, 3],
   ],
 ];
@@ -216,12 +216,12 @@ export function getGeometryData(distanceField) {
           let l = 0;
           let m = 0;
           for (let k = 0; k < 3; k++) {
-            const p = positions[a + k] - positions[c + k];
-            const q = positions[b + k] - positions[d + k];
+            const p = positions[a + k] - positions[d + k];
+            const q = positions[b + k] - positions[c + k];
             l += p * p;
             m += q * q;
           }
-          const quadIndex = quadIndices[(l > m) | 0][(cornerMask & 1) | 0];
+          const quadIndex = quadIndices[(cornerMask & 1) | 0][(l > m) | 0];
           for (let k = 0; k < 6; k++) {
             indices[indicesCount + k] = quad[quadIndex[k]];
           }
