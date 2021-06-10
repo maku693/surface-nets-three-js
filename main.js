@@ -14,7 +14,7 @@ var stats = new Stats();
 stats.showPanel(1);
 document.body.appendChild(stats.dom);
 
-const distanceField = new DistanceField(64);
+const distanceField = new DistanceField(32);
 
 // distanceField.drawDistanceFunction(
 //   translate(
@@ -110,7 +110,6 @@ function onWindowResize() {
 })();
 
 setInterval(() => {
-  stats.begin();
   distanceField.drawDistanceFunction(
     translate(
       random((distanceField.width / 4) * 1, (distanceField.width / 4) * 3),
@@ -120,7 +119,9 @@ setInterval(() => {
     )
   );
 
+  stats.begin();
   const { positions, normals, indices } = getGeometryData(distanceField);
+  stats.end();
 
   geometry.setAttribute(
     "position",
@@ -133,7 +134,6 @@ setInterval(() => {
     distanceField.depth * -0.5
   );
   geometry.setIndex(indices);
-  stats.end();
 }, 16);
 
 function random(min, max) {
