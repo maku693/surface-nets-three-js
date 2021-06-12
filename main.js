@@ -65,11 +65,18 @@ const material = new THREE.MeshNormalMaterial();
 const mesh = new THREE.Mesh(geometry, material);
 group.add(mesh);
 
-// const wireframe = new THREE.WireframeGeometry(geometry);
-// const line = new THREE.LineSegments(wireframe);
-// line.material.opacity = 0.5;
-// line.material.transparent = true;
-// group.add(line);
+const plane = new THREE.PlaneGeometry(
+  distanceField.width,
+  distanceField.depth,
+  distanceField.width,
+  distanceField.depth
+);
+plane.rotateX(Math.PI * 0.5);
+const planeWireframe = new THREE.WireframeGeometry(plane);
+const planeLine = new THREE.LineSegments(planeWireframe);
+planeLine.material.opacity = 0.5;
+planeLine.material.transparent = true;
+scene.add(planeLine);
 
 scene.add(group);
 
@@ -115,7 +122,7 @@ setInterval(() => {
       random((distanceField.width / 4) * 1, (distanceField.width / 4) * 3),
       random((distanceField.height / 4) * 1, (distanceField.height / 4) * 3),
       random((distanceField.depth / 4) * 1, (distanceField.depth / 4) * 3),
-      sphere(distanceField.width / 16)
+      sphere(distanceField.width / 8)
     )
   );
 
