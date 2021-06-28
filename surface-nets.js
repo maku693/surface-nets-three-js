@@ -209,6 +209,7 @@ export function getGeometryData(distanceField) {
           const b = quad[1] * 3;
           const c = quad[2] * 3;
           const d = quad[3] * 3;
+          // squared lengthes
           let l = 0;
           let m = 0;
           for (let k = 0; k < 3; k++) {
@@ -217,6 +218,7 @@ export function getGeometryData(distanceField) {
             l += p * p;
             m += q * q;
           }
+          // connect shorter diagonal
           const quadIndex =
             quadCornerIndices[(cornerMask & 1) + ((l > m) << 1)];
           for (let k = 0; k < 6; k++) {
