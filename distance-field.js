@@ -30,7 +30,14 @@ export class DistanceField {
 
 export function merge(...ff) {
   return function (x, y, z) {
-    return Math.min(...ff.map((f) => f(x, y, z)));
+    let res = Infinity;
+    for (const f of ff) {
+      const tmp = f(x, y, z);
+      if (tmp < res) {
+        res = tmp;
+      }
+    }
+    return res;
   };
 }
 

@@ -14,7 +14,7 @@ var stats = new Stats();
 stats.showPanel(1);
 document.body.appendChild(stats.dom);
 
-const distanceField = new DistanceField(32);
+const distanceField = new DistanceField(128);
 
 // distanceField.drawDistanceFunction(
 //   translate(
@@ -48,7 +48,10 @@ geometry.setAttribute(
   "position",
   new THREE.Float32BufferAttribute(positions, 3)
 );
-geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+geometry.setAttribute(
+  "normal",
+  new THREE.Float32BufferAttribute(normals, 3, true)
+);
 geometry.translate(
   distanceField.width * -0.5,
   distanceField.height * -0.5,
@@ -112,8 +115,10 @@ function onWindowResize() {
 }
 
 (function render() {
+  stats.end();
   renderer.render(scene, camera);
   requestAnimationFrame(render);
+  stats.begin();
 })();
 
 setInterval(() => {
@@ -126,15 +131,16 @@ setInterval(() => {
     )
   );
 
-  stats.begin();
   const { positions, normals, indices } = getGeometryData(distanceField);
-  stats.end();
 
   geometry.setAttribute(
     "position",
     new THREE.Float32BufferAttribute(positions, 3)
   );
-  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+  geometry.setAttribute(
+    "normal",
+    new THREE.Float32BufferAttribute(normals, 3, true)
+  );
   geometry.translate(
     distanceField.width * -0.5,
     distanceField.height * -0.5,
