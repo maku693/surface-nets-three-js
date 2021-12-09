@@ -62,7 +62,6 @@ export function getGeometryData(distanceField) {
       for (let x = 0; x < gridWidth; x++) {
         i++;
         let cornerMask = 0;
-        let quadCount = 0;
 
         for (let j = 0; j < 8; j++) {
           const u = j & 1;
@@ -159,6 +158,8 @@ export function getGeometryData(distanceField) {
         }
 
         verticesCount += 3;
+
+        let quadCount = 0;
 
         if (edges & 0b000000000001) {
           // x, y - 1, z,
